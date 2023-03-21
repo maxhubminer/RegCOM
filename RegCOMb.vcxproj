@@ -144,6 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Registrator.cpp" />
     <ClCompile Include="src\Settings.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_dx9.cpp" />
     <ClCompile Include="src\vendor\imgui\backends\imgui_impl_win32.cpp" />
@@ -154,6 +155,7 @@
     <ClCompile Include="src\vendor\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Registrator.h" />
     <ClInclude Include="src\Settings.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="src\vendor\imgui\backends\imgui_impl_win32.h" />

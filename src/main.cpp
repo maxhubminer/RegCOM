@@ -12,6 +12,7 @@
 #include <string>
 
 #include "Settings.h"
+#include "Registrator.h"
 
 // Data
 static LPDIRECT3D9              g_pD3D = NULL;
@@ -66,6 +67,7 @@ int main(int, char**)
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     Settings settings;
+    Registrator registrator(settings);
     
     // Main loop
     bool done = false;
@@ -94,10 +96,7 @@ int main(int, char**)
         ImGui::Begin("Main");
 
         if (ImGui::Button("REGISTER")) {
-
-            std::string complete_command = settings["regsvr"] + " " + settings["dll_folder"] + settings["dll"];
-            std::system(complete_command.c_str());
-
+            registrator.Register();
         }
             
         if (ImGui::Button("Choose platform"))
