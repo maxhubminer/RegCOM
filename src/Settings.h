@@ -11,6 +11,7 @@ public:
     const std::string& operator[](const std::string&) const;
     void Save();
     void Set(const std::string&, std::string);
+    std::string GetSetting(const std::string& name) const;
 
 private:
     const std::string filepath_ = "settings.txt";

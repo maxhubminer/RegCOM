@@ -28,11 +28,17 @@ Settings::Settings()
         settings_["dll"] = "comcntr.dll";
         settings_["regsvr"] = "regsvr32.exe";
         settings_["dll_folder"] = "";
+        settings_["platform_folder"] = "C:\\Program Files\\1cv8";
     }
 
 }
 
 const std::string& Settings::operator[](const std::string& name) const
+{
+    return settings_.at(name);
+}
+
+std::string Settings::GetSetting(const std::string& name) const
 {
     return settings_.at(name);
 }

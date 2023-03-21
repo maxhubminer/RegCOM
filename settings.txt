@@ -1,0 +1,8 @@
+dll
+comcntr.dll
+dll_folder
+Cherry
+platform_folder
+C:\Program Files\1cv8
+regsvr
+regsvr32.exe

@@ -14,16 +14,41 @@
 #include "Settings.h"
 #include "Registrator.h"
 
+#include <filesystem>
+
 // Data
 static LPDIRECT3D9              g_pD3D = NULL;
 static LPDIRECT3DDEVICE9        g_pd3dDevice = NULL;
 static D3DPRESENT_PARAMETERS    g_d3dpp = {};
+
+int main(int, char**);
 
 // Forward declarations of helper functions
 bool CreateDeviceD3D(HWND hWnd);
 void CleanupDeviceD3D();
 void ResetDevice();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+
+template<typename Container>
+void RefreshPlatforms(const Settings& settings, Container& versions) {
+
+    versions.clear();
+    
+    const std::filesystem::path platform_folder{ settings.GetSetting("platform_folder") };
+    for (auto const& dir_entry : std::filesystem::directory_iterator{ platform_folder })
+    {
+        //versions.push_back(dir_entry.path().filename().c_str());
+        const auto& dir_str = dir_entry.path().filename().string();
+        const auto& dir_char = dir_str.c_str();
+        size_t el_size = strlen(dir_char) + 1;
+        char* el = (char *)malloc(el_size);
+        strcpy_s(el, el_size, dir_char);
+        versions.push_back(el);
+    }
+
+}
+
 
 // Main code
 int main(int, char**)
@@ -63,12 +88,16 @@ int main(int, char**)
 
     // Our state
     bool show_settings_window = false;
-    bool show_platform_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     Settings settings;
     Registrator registrator(settings);
-    
+
+    std::vector<const char*> versions;
+    RefreshPlatforms(settings, versions);
+    static int current_version = 0;
+    settings.Set("dll_folder", versions[current_version]);
+
     // Main loop
     bool done = false;
     while (!done)
@@ -99,10 +128,20 @@ int main(int, char**)
             registrator.Register();
         }
             
-        if (ImGui::Button("Choose platform"))
-            show_platform_window = true;
         if (ImGui::Button("Settings"))
             show_settings_window = true;
+
+        {
+            const char** const versions_cstyle = &versions[0];
+            if (ImGui::ListBox("(Choose platform)", &current_version, versions_cstyle, versions.size(), 4)) {
+                settings.Set("dll_folder", versions[current_version]);
+                // no need to save this value as it's never restored
+            }
+
+            if (ImGui::Button("Refresh")) {
+                RefreshPlatforms(settings, versions);
+            }
+        }
         
         ImGui::End();
 
@@ -121,6 +160,12 @@ int main(int, char**)
                 settings.Set("dll", settings_str_dll);
             }
 
+            char settings_str_platform[256];
+            strcpy_s(settings_str_platform, settings["platform_folder"].c_str());
+            if (ImGui::InputText("(platform folder)", settings_str_platform, IM_ARRAYSIZE(settings_str_platform))) {
+                settings.Set("platform_folder", settings_str_platform);
+            }
+
             if (ImGui::Button("Save")) {
                 settings.Save();
             }
@@ -128,18 +173,8 @@ int main(int, char**)
             ImGui::End();
         }
 
-        if (show_platform_window) {
-            ImGui::Begin("Choose platform", &show_platform_window);
-            ImGui::Text("This is some useful text.");
-            ImGui::End();
-        }
-
-        /*
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-        */
-
         
+
         // Rendering
         ImGui::EndFrame();
         g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
